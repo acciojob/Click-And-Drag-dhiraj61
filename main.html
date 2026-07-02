@@ -36,35 +36,39 @@
 
 <script>
 //Your code goes here 
-// Your code here.
-  function drag(event){
-    let draggable = document.querySelector(`.${event.target.classList[1]}`)
-    const shiftX = event.clientX - draggable.getBoundingClientRect().left;
-    const shiftY = event.clientY - draggable.getBoundingClientRect().top;
+const slider = document.querySelector(".items");
 
-    draggable.style.position = "absolute";
-    draggable.style.zIndex = "1000";
+let isDown = false;
+let startX;
+let scrollLeft;
 
-    function moveAt(pageX, pageY) {
-        draggable.style.left = pageX - shiftX + "px";
-        draggable.style.top = pageY - shiftY + "px";
-    }
+slider.addEventListener("mousedown", (e) => {
+    isDown = true;
+    slider.classList.add("active");
+    startX = e.pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+});
 
-    moveAt(event.pageX, event.pageY);
+slider.addEventListener("mouseleave", () => {
+    isDown = false;
+    slider.classList.remove("active");
+});
 
-    function onMouseMove(e) {
-        moveAt(e.pageX, e.pageY);
-    }
+slider.addEventListener("mouseup", () => {
+    isDown = false;
+    slider.classList.remove("active");
+});
 
-    document.addEventListener("mousemove", onMouseMove);
+slider.addEventListener("mousemove", (e) => {
+    if (!isDown) return;
 
-    document.addEventListener("mouseup", function stopDrag() {
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", stopDrag);
-    });
+    e.preventDefault();
 
-    draggable.ondragstart = () => false;
-};
+    const x = e.pageX - slider.offsetLeft;
+    const walk = x - startX;
+
+    slider.scrollLeft = scrollLeft - walk;
+});
 </script>
   
   </body>

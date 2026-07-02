@@ -36,37 +36,63 @@
 
 <script>
 //Your code goes here 
-const slider = document.querySelector(".items");
+const container = document.querySelector(".items");
+const cubes = document.querySelectorAll(".item");
 
-let isDown = false;
-let startX = 0;
-let scrollLeft = 0;
+let current = null;
+let shiftX = 0;
+let shiftY = 0;
 
-slider.addEventListener("mousedown", (e) => {
-    isDown = true;
-    slider.classList.add("active");
-    startX = e.clientX;
-    scrollLeft = slider.scrollLeft;
+cubes.forEach(cube => {
+    cube.addEventListener("mousedown", startDrag);
 });
 
-slider.addEventListener("mouseleave", () => {
-    isDown = false;
-    slider.classList.remove("active");
-});
+function startDrag(e) {
+    current = e.target;
 
-slider.addEventListener("mouseup", () => {
-    isDown = false;
-    slider.classList.remove("active");
-});
+    const cubeRect = current.getBoundingClientRect();
 
-slider.addEventListener("mousemove", (e) => {
-    if (!isDown) return;
+    shiftX = e.clientX - cubeRect.left;
+    shiftY = e.clientY - cubeRect.top;
+
+    current.style.position = "absolute";
+    current.style.zIndex = "1000";
+
+    document.addEventListener("mousemove", moveCube);
+    document.addEventListener("mouseup", stopDrag);
 
     e.preventDefault();
+}
 
-    const walk = e.clientX - startX;
-    slider.scrollLeft = scrollLeft - walk;
-});
+function moveCube(e) {
+    if (!current) return;
+
+    const containerRect = container.getBoundingClientRect();
+
+    let left = e.clientX - containerRect.left - shiftX;
+    let top = e.clientY - containerRect.top - shiftY;
+
+    // Keep cube inside container
+    left = Math.max(
+        0,
+        Math.min(left, container.clientWidth - current.offsetWidth)
+    );
+
+    top = Math.max(
+        0,
+        Math.min(top, container.clientHeight - current.offsetHeight)
+    );
+
+    current.style.left = left + "px";
+    current.style.top = top + "px";
+}
+
+function stopDrag() {
+    document.removeEventListener("mousemove", moveCube);
+    document.removeEventListener("mouseup", stopDrag);
+
+    current = null;
+}
 </script>
   
   </body>
